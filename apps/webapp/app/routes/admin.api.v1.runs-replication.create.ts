@@ -57,7 +57,12 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 function createRunReplicationService(params: CreateRunReplicationServiceParams) {
-  const url = new URL(env.RUN_REPLICATION_CLICKHOUSE_URL);
+  const clickhouseUrl = env.RUN_REPLICATION_CLICKHOUSE_URL;
+  if (!clickhouseUrl) {
+    throw new Error("RUN_REPLICATION_CLICKHOUSE_URL is not configured");
+  }
+
+  const url = new URL(clickhouseUrl);
 
   // Remove secure param
   url.searchParams.delete("secure");

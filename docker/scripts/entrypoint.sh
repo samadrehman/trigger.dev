@@ -20,7 +20,8 @@ if [ -n "$CLICKHOUSE_URL" ] && [ "$SKIP_CLICKHOUSE_MIGRATIONS" != "1" ]; then
   
   # Strip secure parameter from URL before passing to goose
   # The scheme (http:// vs https://) already encodes TLS choice, so secure param is redundant
-  export GOOSE_DBSTRING="$(echo "$CLICKHOUSE_URL" | sed 's/[?&]secure=[^&]*//g')"
+  # Handle secure as first param (?secure=X&), middle param (&secure=X&), or last param (?secure=X or &secure=X)
+  export GOOSE_DBSTRING="$(echo "$CLICKHOUSE_URL" | sed -e 's/?secure=[^&]*&/?/g' -e 's/&secure=[^&]*//g' -e 's/?secure=[^&]*$//g')"
   
   # Remove trailing ? or & if present after stripping secure param
   export GOOSE_DBSTRING="$(echo "$GOOSE_DBSTRING" | sed 's/[?&]$//')"
